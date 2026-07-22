@@ -74,7 +74,7 @@ Use contrast through scale, weight, position, whitespace, and color—not throug
 
 Reject these habits unless the content specifically calls for them:
 
-- a centered gradient headline followed by a uniform three-card grid;
+- a hero headline followed by a uniform three-card grid;
 - excessive rounded containers, glass panels, pills, and shadows;
 - icons added to every heading;
 - emoji substituted for a coherent icon or labeling system when the source does not call for emoji;

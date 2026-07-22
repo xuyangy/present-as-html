@@ -7,15 +7,29 @@
   <title>REPLACE_WITH_TITLE</title>
   <style>
     :root {
-      color-scheme: light;
+      color-scheme: light dark;
       --paper: #f3efe5;
       --ink: #1d1c19;
       --muted: #69655c;
       --accent: #bc4936;
       --accent-on: #ffffff;
+      --accent-gradient: linear-gradient(135deg, var(--accent) 0%, oklch(from var(--accent) calc(l + 0.02) calc(c + 0.02) calc(h - 80)) 100%);
       --line: rgba(29, 28, 25, 0.18);
       --measure: 68ch;
       --gutter: clamp(1rem, 4vw, 4.5rem);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #191817;
+        --ink: #ece8de;
+        --muted: #a49e93;
+        --accent: #e0684e;
+        --accent-on: #191817;
+        --line: rgba(236, 232, 222, 0.18);
+        /* On dark grounds, lift lightness and chroma at both ends so the gradient glows instead of muting. */
+        --accent-gradient: linear-gradient(135deg, oklch(from var(--accent) calc(l + 0.06) calc(c + 0.04) h) 0%, oklch(from var(--accent) calc(l + 0.16) calc(c + 0.11) calc(h - 80)) 100%);
+      }
     }
 
     * { box-sizing: border-box; }
@@ -68,6 +82,18 @@
     h1 { font-size: clamp(3.2rem, 10vw, 9.5rem); }
     h2 { font-size: clamp(2.2rem, 6vw, 5.5rem); }
 
+    /* Emphasis device for a few consequential words or phrases (headings or body copy). */
+    .gradient-text { color: var(--accent); }
+
+    @supports (color: oklch(from red l c h)) {
+      .gradient-text {
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+
     .lede,
     .prose { max-width: var(--measure); }
 
@@ -101,6 +127,11 @@
     @media print {
       body { background: #fff; color: #000; }
       .hero, .chapter { min-height: auto; break-inside: avoid; }
+      .gradient-text {
+        background: none;
+        -webkit-text-fill-color: currentColor;
+        color: inherit;
+      }
     }
   </style>
 </head>
