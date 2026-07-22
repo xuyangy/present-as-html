@@ -10,12 +10,13 @@ Use for education, care, community, wellness, reflective guidance, and approacha
   --ink: #2d2923;
   --muted: #6b6155;
   --accent: #b65337;
+  --accent-on: #ffffff;
   --leaf: #5d7158;
   --line: #d8c7b3;
   --wash: #ead9c4;
   --font-display: Baskerville, "Iowan Old Style", Georgia, serif;
   --font-body: Charter, "Bitstream Charter", Georgia, serif;
-  --font-meta: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
+  --font-utility: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
   --measure: 66ch;
   --radius: 0.75rem;
 }
@@ -53,4 +54,3 @@ Keep motion around 2–4 with slow settles and direct feedback. On mobile, prese
 ## Image prompt DNA
 
 Use: tactile editorial illustration or documentary still, warm cream and terracotta with muted botanical green, natural side light, subtle paper or textile texture, human scale, calm negative space, no corporate stock poses, no embedded labels.
-

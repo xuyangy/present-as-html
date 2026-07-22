@@ -15,8 +15,8 @@ Turn source material into a memorable web page whose visual structure clarifies 
    - the narrative sequence;
    - facts, quotes, comparisons, processes, hierarchies, and calls to action;
    - claims that must not be embellished.
-2. Create a compact Design Read before coding: page type, audience, reading goal, source-fidelity mode, design context, visual language, form source, signature investment, layout width, information density, motion intensity, asset dependence, and constraints. Read [Editorial Planning](references/editorial-planning.md) for the modes and template. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md).
-3. Choose one coherent visual concept derived from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas. Keep structure, density, layout, expressive temperature, and aesthetics as separate decisions. If the user supplies no visual direction, read [Content-Led Design Directions](references/design-directions.md), select a content-appropriate recipe, and load only that recipe file. When the recipe needs more range, select at most one source-earned extension from [Content-Safe Expressive Techniques](references/expressive-techniques.md).
+2. Create a compact Design Read before coding: page type, audience, reading goal, content mode, design context, visual language, form source, signature investment, expressive temperature, layout width, visual variance, information density, motion intensity, asset dependence, and constraints. Read [Editorial Planning](references/editorial-planning.md) for the modes and template. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md).
+3. Read the [Design Playbook](references/design-playbook.md) for substantial pages, then choose one coherent visual concept derived from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas. Keep structure, density, layout, expressive temperature, and aesthetics as separate decisions. If the user supplies no visual direction, read [Content-Led Design Directions](references/design-directions.md), select a content-appropriate recipe, and load only that recipe file. When the recipe needs more range, select at most one source-earned extension from [Content-Safe Expressive Techniques](references/expressive-techniques.md).
 4. Map purposeful sections. Give every section a distinct communication job, identify the source material it must preserve, and plan its energy and contrast role. For a substantial page, choose content-shaped contracts from [Section Composition Grammar](references/composition-grammar.md) before coding.
 5. Decide which ideas benefit from a visual form:
    - comparison or repeated values → table, bars, or small multiples;
@@ -46,8 +46,6 @@ Turn source material into a memorable web page whose visual structure clarifies 
 
 ## Visual direction
 
-Read the [Design Playbook](references/design-playbook.md) before designing a substantial page or when deciding among images, diagrams, motion, and interactions.
-
 Treat a recipe as a concrete starting system, not a template to copy. Adapt its tokens and grammar to the source while preserving its internal logic. Keep one recipe dominant; combine two only when each has a declared responsibility.
 
 Recipe references: [Evidence-led editorial](references/recipe-evidence-led.md), [press editorial](references/recipe-press-editorial.md), [Swiss structured](references/recipe-swiss-structured.md), [technical schematic](references/recipe-technical-schematic.md), [warm humanist](references/recipe-warm-humanist.md), [archival field guide](references/recipe-archival-field-guide.md), [kinetic editorial](references/recipe-kinetic-editorial.md), and [raw document](references/recipe-raw-document.md).
@@ -57,7 +55,7 @@ Apply these defaults:
 - Make one visual idea dominant. Avoid a dashboard-like grid of interchangeable rounded cards unless the content is actually a dashboard.
 - Use a deliberate type system with a display face and a readable body face. Prefer system fonts or gracefully degrading web fonts.
 - For multilingual, longform, or display-sensitive pages, derive roles, scale, measure, language fallbacks, and loading through [Typography System](references/typography-system.md).
-- Establish a restrained palette with named CSS custom properties and one strong accent.
+- Establish a restrained palette with named CSS custom properties and one primary accent; add a secondary signal only when it carries a distinct semantic role.
 - When the recipe palette needs a content-appropriate variant, choose one coherent token bundle from [Palette Families](references/palette-families.md); do not mix individual swatches across bundles.
 - Use generous spacing and a clear rhythm. Let important elements break the grid intentionally.
 - Prefer semantic HTML (`main`, `article`, `section`, `figure`, `nav`) and a logical heading hierarchy.
@@ -111,7 +109,7 @@ Apply these defaults:
 Use the P0–P3 severity model in [Severity-Ranked Quality Checks](references/quality-checks.md), then confirm before delivery:
 
 - The page has a clear opening, narrative progression, and ending.
-- Its source-fidelity mode is evident and all must-preserve material is present.
+- Its content mode is evident and all must-preserve material is present.
 - The design feels specific to the subject rather than like a generic landing-page template.
 - The form source can be traced to the supplied content; unrelated content could not replace it without changing the concept.
 - Visuals explain or reinforce the source instead of decorating empty space.

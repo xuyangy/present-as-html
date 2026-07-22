@@ -32,6 +32,8 @@ Use no more roles than the page can make meaningfully distinct:
 - **Utility:** captions, notes, labels, navigation, and metadata.
 - **Data/code:** optional monospaced or tabular role when alignment carries meaning.
 
+When a recipe exposes a CSS token for the utility role, name it `--font-utility`; reserve `--font-data` for tabular, code, or measurement alignment.
+
 Five visible size tiers are usually enough. Start with body size and select a modular ratio by content behavior:
 
 | Ratio | Character | Useful for |

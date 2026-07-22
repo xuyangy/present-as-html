@@ -12,6 +12,19 @@ from urllib.parse import unquote, urlparse
 
 
 PLACEHOLDER = re.compile(r"(?:REPLACE_WITH_|\b(?:TODO|LOREM IPSUM)\b)", re.IGNORECASE)
+CSS_URL = re.compile(r"url\(\s*(['\"]?)([^'\")]+)\1\s*\)", re.IGNORECASE)
+
+
+def srcset_urls(value: str) -> list[str]:
+    """Return candidate URLs from a conventional comma-separated srcset."""
+    if re.search(r"(?:^|,\s*)data:", value, re.IGNORECASE):
+        return []
+    urls: list[str] = []
+    for candidate in value.split(","):
+        parts = candidate.strip().split()
+        if parts and parts[0]:
+            urls.append(parts[0])
+    return urls
 
 
 def warning_priority(message: str) -> str:
@@ -72,6 +85,9 @@ class PageParser(HTMLParser):
             value = values.get(attribute)
             if value:
                 self.refs.append((attribute, value))
+        srcset = values.get("srcset")
+        if srcset:
+            self.refs.extend(("srcset", value) for value in srcset_urls(srcset))
 
     def handle_endtag(self, tag: str) -> None:
         if tag == "title":
@@ -103,6 +119,8 @@ def check(page: Path) -> tuple[list[str], list[str]]:
     except Exception as exc:  # HTMLParser errors are uncommon but actionable.
         errors.append(f"Could not parse HTML: {exc}")
         return errors, warnings
+
+    parser.refs.extend(("css url", value) for _, value in CSS_URL.findall(text))
 
     if "html" not in parser.tags or "body" not in parser.tags:
         errors.append("Missing <html> or <body> element")

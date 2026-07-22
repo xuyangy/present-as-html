@@ -178,6 +178,15 @@ def main() -> int:
                                 .map(label => label.textContent || '').join(' ').trim();
                               if (text) return text;
                             }
+                            const mediaName = element.querySelector(
+                              'img[alt], svg[aria-label], svg title'
+                            );
+                            if (mediaName) {
+                              const mediaLabel = mediaName.getAttribute?.('alt') ||
+                                mediaName.getAttribute?.('aria-label') ||
+                                mediaName.textContent || '';
+                              if (mediaLabel.trim()) return mediaLabel.trim();
+                            }
                             return (
                               element.getAttribute('alt') ||
                               element.textContent ||

@@ -12,7 +12,7 @@ Use this reference only when the selected recipe's default palette needs a conte
 
 ## Choose a palette as a system
 
-- Preserve semantic roles: `paper`, `ink`, `muted`, `line`, `wash`, `accent`, and `accent-on`.
+- Preserve the core semantic roles: `paper`, `ink`, `muted`, `line`, `accent`, and `accent-on`. Treat `wash`, `surface`, `inverse`, and other material roles as recipe-specific extensions.
 - Use one bundle across the page. A bounded inverse section may swap paper and ink; it does not introduce a second palette.
 - Treat the recipe as authoritative for material behavior. A Press palette may use paper texture and editorial shadow; a Swiss palette keeps flat fills, square edges, and no gradients.
 - User or brand colors outrank these presets. When brand colors are supplied, derive the missing semantic roles and check contrast instead of rejecting the brand.

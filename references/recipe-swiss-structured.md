@@ -10,6 +10,7 @@ Use for briefings, comparisons, institutional explanations, policy summaries, an
   --ink: #101010;
   --muted: #5b5b54;
   --accent: #d5231e;
+  --accent-on: #ffffff;
   --line: #cdcdc4;
   --wash: #e9e9e2;
   --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;

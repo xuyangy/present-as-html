@@ -11,6 +11,7 @@ Use for systems, mechanisms, workflows, engineering explanations, and interactiv
   --ink: #edf3f4;
   --muted: #a8bac1;
   --accent: #62d4f5;
+  --accent-on: #0f1820;
   --signal: #ffb45c;
   --line: #36515d;
   --grid: rgba(98, 212, 245, 0.08);

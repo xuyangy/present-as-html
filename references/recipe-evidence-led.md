@@ -10,6 +10,7 @@ Use for research, reports, investigations, technical essays, and any page where 
   --ink: #1b1a17;
   --muted: #69655c;
   --accent: #963f32;
+  --accent-on: #ffffff;
   --line: #d6d0c2;
   --wash: #ebe6da;
   --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
@@ -52,4 +53,3 @@ Keep motion intensity around 1–3: focus changes, short reveals, or path emphas
 ## Image prompt DNA
 
 Use: warm off-white ground, restrained editorial documentary treatment, graphite and oxide-red accents, precise composition, visible material detail, generous negative space, no embedded labels, no fake documents, no institutional logos. Keep evidence-bearing text in HTML.
-

@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="REPLACE_WITH_PAGE_DESCRIPTION">
   <title>REPLACE_WITH_TITLE</title>
-  <script>document.documentElement.classList.add('js');</script>
   <style>
     :root {
       color-scheme: light;
@@ -13,6 +12,7 @@
       --ink: #1d1c19;
       --muted: #69655c;
       --accent: #bc4936;
+      --accent-on: #ffffff;
       --line: rgba(29, 28, 25, 0.18);
       --measure: 68ch;
       --gutter: clamp(1rem, 4vw, 4.5rem);
@@ -30,8 +30,6 @@
       text-rendering: optimizeLegibility;
       text-wrap: pretty;
     }
-
-    main { overflow: clip; }
 
     .skip-link {
       position: fixed;
@@ -56,13 +54,6 @@
       display: grid;
       align-content: end;
       border-bottom: 1px solid var(--line);
-    }
-
-    .eyebrow {
-      color: var(--accent);
-      font: 700 0.75rem/1.2 ui-sans-serif, system-ui, sans-serif;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
     }
 
     h1,
@@ -94,17 +85,6 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .js .reveal {
-      opacity: 0;
-      transform: translateY(1.5rem);
-      transition: opacity 600ms ease, transform 600ms ease;
-    }
-
-    .js .reveal.is-visible {
-      opacity: 1;
-      transform: none;
-    }
-
     :focus-visible {
       outline: 3px solid var(--accent);
       outline-offset: 4px;
@@ -115,20 +95,12 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-
-      .js .reveal { opacity: 1; transform: none; }
+      html { scroll-behavior: auto; }
     }
 
     @media print {
       body { background: #fff; color: #000; }
       .hero, .chapter { min-height: auto; break-inside: avoid; }
-      .js .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
@@ -137,14 +109,12 @@
   <main id="main-content">
     <article>
       <header class="hero">
-        <p class="eyebrow">REPLACE_WITH_KICKER</p>
         <h1>REPLACE_WITH_TITLE</h1>
         <p class="lede">REPLACE_WITH_OPENING_SUMMARY</p>
       </header>
 
-      <section class="chapter reveal" aria-labelledby="chapter-one-title">
+      <section class="chapter" aria-labelledby="chapter-one-title">
         <div>
-          <p class="eyebrow">01 — REPLACE_WITH_LABEL</p>
           <h2 id="chapter-one-title">REPLACE_WITH_SECTION_TITLE</h2>
         </div>
         <div class="prose">
@@ -154,23 +124,5 @@
     </article>
   </main>
 
-  <script>
-    const reveals = document.querySelectorAll('.reveal');
-
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        }
-      }, { threshold: 0.15 });
-
-      reveals.forEach((element) => observer.observe(element));
-    } else {
-      reveals.forEach((element) => element.classList.add('is-visible'));
-    }
-  </script>
 </body>
 </html>

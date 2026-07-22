@@ -10,12 +10,13 @@ Use for visual essays, manifestos, launches, transformation stories, and scrolly
   --ink: #111111;
   --muted: #5e5a53;
   --accent: #ed4b35;
+  --accent-on: #ffffff;
   --signal: #255edb;
   --line: #c7c1b6;
   --void: #171717;
   --font-display: "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
   --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-meta: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-utility: ui-monospace, "SFMono-Regular", Consolas, monospace;
   --measure: 60ch;
   --radius: 0;
 }

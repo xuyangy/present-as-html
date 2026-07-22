@@ -10,6 +10,7 @@ Use for technical notes, source-heavy dossiers, countercultural essays, incident
   --ink: #090909;
   --muted: #565656;
   --accent: #0758d9;
+  --accent-on: #ffffff;
   --marker: #eee34b;
   --line: #090909;
   --wash: #efede5;

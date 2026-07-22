@@ -10,12 +10,13 @@ Use for history, place, ecology, taxonomy, collections, biographies through arti
   --ink: #29261f;
   --muted: #696254;
   --accent: #873e31;
+  --accent-on: #ffffff;
   --moss: #56614a;
   --line: #bdb198;
   --wash: #dcd0b7;
   --font-display: Baskerville, "Baskerville Old Face", Georgia, serif;
   --font-body: "Iowan Old Style", Palatino, Georgia, serif;
-  --font-label: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-utility: ui-monospace, "SFMono-Regular", Consolas, monospace;
   --measure: 64ch;
   --radius: 0.1rem;
 }
@@ -53,4 +54,3 @@ Keep motion around 1–4: unfolding layers, map focus, or specimen annotation. O
 ## Image prompt DNA
 
 Use: clearly illustrative archival field-guide plate, warm paper, ink and muted moss, measured specimen arrangement, authentic material detail without counterfeit provenance, no fabricated stamps or dates, no embedded explanatory text.
-

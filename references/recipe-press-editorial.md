@@ -10,11 +10,12 @@ Use for profiles, interviews, criticism, cultural reporting, opinion, and narrat
   --ink: #121212;
   --muted: #625f58;
   --accent: #c92f2a;
+  --accent-on: #ffffff;
   --line: #bdb8ad;
   --wash: #ded9ce;
   --font-display: "Arial Narrow", "Helvetica Neue Condensed", "Franklin Gothic Medium", sans-serif;
   --font-body: Georgia, "Times New Roman", serif;
-  --font-meta: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-utility: ui-monospace, "SFMono-Regular", Consolas, monospace;
   --measure: 64ch;
   --radius: 0;
 }

@@ -1,6 +1,6 @@
 # Design Playbook
 
-Use this reference to turn a content outline into a visual system. Select only the patterns the material needs. For section-level structure, use [Section Composition Grammar](composition-grammar.md) rather than inventing a new layout for every section.
+Use this reference to turn a content outline into a visual system. It owns page archetypes, visual hierarchy, imagery, interaction principles, and the final critique. Select only the patterns the material needs. For section-level structure, use [Section Composition Grammar](composition-grammar.md); for motion intensity 5+, use [Motion Grammar for Editorial Pages](motion-grammar.md).
 
 When the page has no established visual direction, select one through `design-directions.md` and read only the chosen recipe. Let the source provide the motif; let the recipe provide the visual grammar.
 
@@ -38,7 +38,7 @@ Answer four questions before choosing its layout:
 
 - **Narrative role:** opening, transition, explanation, evidence, comparison, pause, or synthesis?
 - **Viewing context:** close reading on a phone, ordinary laptop reading, projected display, or print?
-- **Visual temperature:** quiet, energized, authoritative, warm, somber, playful, or tense?
+- **Section temperature:** quiet, energized, authoritative, warm, somber, playful, or tense?
 - **Capacity:** does the material fit the proposed composition without overflow or empty filler?
 
 Let these answers determine the visual register. Do not start with a favorite card layout and pour every section into it.
