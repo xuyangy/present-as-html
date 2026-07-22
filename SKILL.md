@@ -1,6 +1,6 @@
 ---
 name: present-as-html
-description: Transform supplied text, notes, reports, articles, explanations, or structured content into a polished, visually expressive HTML page. Use when Codex needs to present source material as a standalone webpage, visual essay, scrollytelling page, interactive explainer, rich report, or microsite with typography, imagery, diagrams, charts, animations, or lightweight interactions while preserving the source's meaning.
+description: Transform supplied text, notes, reports, articles, explanations, or structured content into a polished, visually expressive HTML page. Use when Codex needs to present source material as a standalone webpage, visual essay, scrollytelling page, interactive explainer, rich report, or content-led microsite with typography, imagery, diagrams, charts, animations, or lightweight interactions while preserving the source's meaning. Do not use for dashboards, operational product interfaces, or general-purpose web applications.
 ---
 
 # Present as HTML
@@ -15,19 +15,25 @@ Turn source material into a memorable web page whose visual structure clarifies 
    - the narrative sequence;
    - facts, quotes, comparisons, processes, hierarchies, and calls to action;
    - claims that must not be embellished.
-2. Choose one coherent visual concept before coding. Derive it from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas.
-3. Sketch 3–7 purposeful sections. Give every section a distinct communication job and vary the composition across the page.
-4. Decide which ideas benefit from a visual form:
+2. Create a compact Design Read before coding: page type, audience, reading goal, source-fidelity mode, design context, visual language, form source, signature investment, layout width, information density, motion intensity, asset dependence, and constraints. Read [Editorial Planning](references/editorial-planning.md) for the modes and template. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md).
+3. Choose one coherent visual concept derived from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas. Keep structure, density, layout, expressive temperature, and aesthetics as separate decisions. If the user supplies no visual direction, read [Content-Led Design Directions](references/design-directions.md), select a content-appropriate recipe, and load only that recipe file. When the recipe needs more range, select at most one source-earned extension from [Content-Safe Expressive Techniques](references/expressive-techniques.md).
+4. Map purposeful sections. Give every section a distinct communication job, identify the source material it must preserve, and plan its energy and contrast role. For a substantial page, choose content-shaped contracts from [Section Composition Grammar](references/composition-grammar.md) before coding.
+5. Decide which ideas benefit from a visual form:
    - comparison or repeated values → table, bars, or small multiples;
+   - verified metrics, ranks, or specifications → metric stage, ledger, ranked measure, or specification sheet;
    - sequence or change → timeline or scroll progression;
-   - flow or causality → diagram;
+   - flow, causality, recurrence, or convergence → process, system, loop, or convergence diagram;
+   - places or routes → a sourced geographic map with a static text/visual fallback;
+   - several comparable artifacts → an evidence matrix with consistent framing and captions;
    - hierarchy → tree or nested composition;
    - mood or setting → image or illustration;
    - optional detail → disclosure, tabs, tooltip, or modal.
-5. Build the page as a self-contained `index.html` unless the user requests a project or framework. Start from `assets/page-shell.html` when useful, but replace its placeholder visual language rather than merely recoloring it.
-6. Inspect the result in a browser at desktop and mobile widths. Fix overflow, collisions, illegible contrast, motion problems, and weak hierarchy.
-7. Run `python3 scripts/check_html.py <path-to-html>` and resolve relevant warnings.
-8. Deliver the HTML file and briefly describe its visual concept and interactions.
+6. Choose an asset mode: no external images, user-provided assets, honest placeholders, sourced assets, or generated assets. For consequential images, screenshots, scans, or diagrams, define their destination and fidelity through [Media Framing and Fidelity](references/media-framing.md) before transforming or generating them. When real external assets are required, use [Asset Sourcing and Selection](references/asset-sourcing.md) to compare, verify, and record candidates. Do not treat code-native diagrams and external images as substitutes for each other.
+7. For a long or visually risky page, build the opening plus one representative section first and inspect it as the style anchor. Continue without a user checkpoint unless a choice would materially change the requested result.
+8. Build the page as a self-contained `index.html` unless the user requests a project or framework. Start from [the page shell](assets/page-shell.html) when useful, but replace its placeholder visual language rather than merely recoloring it.
+9. Inspect the result in a browser at desktop and mobile widths. When Python Playwright and Chromium are available, run `python3 scripts/review_html.py <path-to-html>` with the bundled [browser reviewer](scripts/review_html.py) to capture normal and reduced-motion viewports, console errors, failed requests, broken images, unnamed controls, and horizontal overflow. For reports and guides, use `--modes all` to include print media. Inspect its screenshots rather than trusting the report alone. Otherwise use the runtime-native browser and disclose any remaining visual-QA limitation.
+10. Run `python3 scripts/check_html.py <path-to-html>` and use [Severity-Ranked Quality Checks](references/quality-checks.md). Resolve every P0 plus relevant P1 and P2 findings.
+11. Deliver the HTML file and briefly describe its visual concept and interactions.
 
 ## Preserve the source
 
@@ -36,24 +42,39 @@ Turn source material into a memorable web page whose visual structure clarifies 
 - Never invent metrics, quotes, dates, sources, testimonials, or citations.
 - Visually distinguish quoted material, inferred synthesis, and supporting context.
 - If source content is sparse, create atmosphere and hierarchy instead of padding it with fabricated prose.
+- Default to faithful preservation when the user asks to convert or present text without requesting summarization. If using an edited, condensed, or reconstructed mode, make the change in fidelity intentional and disclose it in the handoff.
 
 ## Visual direction
 
-Read `references/design-playbook.md` before designing a substantial page or when deciding among images, diagrams, motion, and interactions.
+Read the [Design Playbook](references/design-playbook.md) before designing a substantial page or when deciding among images, diagrams, motion, and interactions.
+
+Treat a recipe as a concrete starting system, not a template to copy. Adapt its tokens and grammar to the source while preserving its internal logic. Keep one recipe dominant; combine two only when each has a declared responsibility.
+
+Recipe references: [Evidence-led editorial](references/recipe-evidence-led.md), [press editorial](references/recipe-press-editorial.md), [Swiss structured](references/recipe-swiss-structured.md), [technical schematic](references/recipe-technical-schematic.md), [warm humanist](references/recipe-warm-humanist.md), [archival field guide](references/recipe-archival-field-guide.md), [kinetic editorial](references/recipe-kinetic-editorial.md), and [raw document](references/recipe-raw-document.md).
 
 Apply these defaults:
 
 - Make one visual idea dominant. Avoid a dashboard-like grid of interchangeable rounded cards unless the content is actually a dashboard.
 - Use a deliberate type system with a display face and a readable body face. Prefer system fonts or gracefully degrading web fonts.
+- For multilingual, longform, or display-sensitive pages, derive roles, scale, measure, language fallbacks, and loading through [Typography System](references/typography-system.md).
 - Establish a restrained palette with named CSS custom properties and one strong accent.
+- When the recipe palette needs a content-appropriate variant, choose one coherent token bundle from [Palette Families](references/palette-families.md); do not mix individual swatches across bundles.
 - Use generous spacing and a clear rhythm. Let important elements break the grid intentionally.
 - Prefer semantic HTML (`main`, `article`, `section`, `figure`, `nav`) and a logical heading hierarchy.
 - Create responsive compositions with `clamp()`, grid/flex layouts, and focused breakpoints; do not shrink a desktop canvas to fit mobile.
+- Use `text-wrap: pretty` where supported and container queries when a component's own width should determine its layout.
+- Use placeholders rather than counterfeit logos, products, screenshots, metrics, or testimonials.
 
 ## Images and diagrams
 
 - Use images only when they add evidence, orientation, mood, or explanatory value.
-- Prefer user-provided images. When image search or generation tools are available and imagery materially improves the page, use them and save output beside the HTML in a clearly named asset folder.
+- Classify proposed media as essential, supporting, or ornamental; omit ornamental media by default.
+- Prefer user-provided and authoritative assets. For a named brand or product, use real logos, product imagery, or interface screenshots; never replace identity-critical material with CSS silhouettes or fabricated marks.
+- Default supplied screenshots, charts, documents, and interfaces to preservation or programmatic reframing; do not regenerate them merely for stylistic consistency.
+- When image search or generation tools are available and imagery materially improves the page, use them and save output beside the HTML in a clearly named asset folder. Use sourced imagery for evidence and generated imagery for non-identity-critical atmosphere or illustration.
+- Before generating raster assets, read [Image Generation](references/image-generation.md) and follow its backend-resolution, prompt-record, batching, and fallback contract.
+- For generated documentary, explanatory, process, comparison, system, UI-scenario, or data-poster imagery, select a purpose scaffold from [Image Prompt Patterns](references/image-prompt-patterns.md) and adapt it to the page recipe.
+- Keep important labels, facts, and interface text as HTML or accessible SVG text rather than baking them into generated images.
 - Provide meaningful `alt` text for informative images and empty `alt` text for decorative ones.
 - Use CSS, inline SVG, or Canvas for diagrams. Use HTML/CSS for simple structures and SVG for precise connections, paths, or labeled geometry.
 - Keep diagrams legible without animation and on narrow screens. Do not encode essential meaning by color alone.
@@ -63,31 +84,41 @@ Apply these defaults:
 
 - Use motion to reveal structure, show causality, establish progression, or provide feedback.
 - Favor a few choreographed moments over constant ambient movement.
+- Give each animated section one semantic motion recipe based on its relationship—opening settle, cascade, quote line, directional pair, accumulation, path, state change, or explicit step-through. Do not apply the same generic reveal to every section.
+- For motion intensity 5+, scrollytelling, shared-element transitions, or geometry-dependent choreography, read [Motion Grammar for Editorial Pages](references/motion-grammar.md) before implementation.
+- Plan the relationship or narrative beat first; choose the exact animation during implementation. Do not let a preselected effect dictate the content.
+- In scrollytelling, give each beat one focused change. Reveal enumerated points progressively while retaining earlier context in a quieter state.
 - Use `IntersectionObserver` for scroll reveals and CSS transitions for state changes.
 - Keep controls keyboard accessible and use native elements (`button`, `details`, `dialog`) where possible.
 - Ensure all content remains available when JavaScript fails.
 - Respect `prefers-reduced-motion`; disable smooth scrolling, parallax, and nonessential transitions for those users.
+- When Canvas, WebGL, or substantial scroll choreography is used, also provide an obvious manual static-effects control and a complete static fallback.
 - Avoid scroll hijacking, pointer-following gimmicks, autoplay audio, and effects that obscure reading.
+- A step-through component must use explicit controls and state text; never consume ordinary page scroll or keyboard navigation to force progression.
 
 ## Implementation constraints
 
 - Produce valid HTML with a viewport meta tag, a descriptive title, and no build step by default.
-- Keep CSS and JavaScript inline for a single-file deliverable. Split assets only when images, fonts, or the user's requested project structure require it.
+- Keep CSS and JavaScript inline for a single-file deliverable. Copy required assets locally and split them out only when images, fonts, or the user's requested project structure require it.
 - Avoid adding libraries for effects that are simple in native CSS or JavaScript.
 - If external dependencies are necessary, pin versions, minimize their number, and make the dependency obvious in the handoff.
 - Render untrusted source text as text, not raw HTML. Never interpolate it into JavaScript.
+- Preserve supplied claims as supplied. Verify and record authoritative sources before adding current factual assertions about real products, people, organizations, events, specifications, or policies.
 - Add print styles when the content resembles a report, guide, brief, or reference document.
 
 ## Quality bar
 
-Confirm before delivery:
+Use the P0–P3 severity model in [Severity-Ranked Quality Checks](references/quality-checks.md), then confirm before delivery:
 
 - The page has a clear opening, narrative progression, and ending.
+- Its source-fidelity mode is evident and all must-preserve material is present.
 - The design feels specific to the subject rather than like a generic landing-page template.
+- The form source can be traced to the supplied content; unrelated content could not replace it without changing the concept.
 - Visuals explain or reinforce the source instead of decorating empty space.
+- Every interactive or custom visual block still belongs to a content-led page rather than turning it into a dashboard or generic application.
 - Body text remains comfortable to read, with sensible line length and contrast.
 - The page works at approximately 375 px and 1440 px widths.
 - Keyboard focus is visible and interactive elements have clear affordances.
 - Reduced-motion users receive a calm version.
+- Missing assets are exposed honestly; identity, evidence, and credibility are not fabricated.
 - There are no broken local asset paths, console errors, accidental horizontal scrolling, or placeholder text.
-
