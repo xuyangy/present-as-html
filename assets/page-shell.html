@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="REPLACE_WITH_PAGE_DESCRIPTION">
+  <title>REPLACE_WITH_TITLE</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3efe5;
+      --ink: #1d1c19;
+      --muted: #69655c;
+      --accent: #bc4936;
+      --line: rgba(29, 28, 25, 0.18);
+      --measure: 68ch;
+      --gutter: clamp(1rem, 4vw, 4.5rem);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 400 clamp(1rem, 0.95rem + 0.2vw, 1.15rem)/1.65 ui-serif, Georgia, serif;
+      text-rendering: optimizeLegibility;
+    }
+
+    main { overflow: clip; }
+
+    .hero,
+    .chapter {
+      padding: clamp(4rem, 10vw, 9rem) var(--gutter);
+    }
+
+    .hero {
+      min-height: 85svh;
+      display: grid;
+      align-content: end;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font: 700 0.75rem/1.2 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2 {
+      max-width: 14ch;
+      margin: 0.25em 0;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+    }
+
+    h1 { font-size: clamp(3.2rem, 10vw, 9.5rem); }
+    h2 { font-size: clamp(2.2rem, 6vw, 5.5rem); }
+
+    .lede,
+    .prose { max-width: var(--measure); }
+
+    .lede {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: clamp(1.15rem, 2vw, 1.6rem);
+    }
+
+    .chapter {
+      min-height: 70svh;
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: clamp(2rem, 7vw, 8rem);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(1.5rem);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    @media (max-width: 720px) {
+      .chapter { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      .hero, .chapter { min-height: auto; break-inside: avoid; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <p class="eyebrow">REPLACE_WITH_KICKER</p>
+      <h1>REPLACE_WITH_TITLE</h1>
+      <p class="lede">REPLACE_WITH_OPENING_SUMMARY</p>
+    </header>
+
+    <section class="chapter reveal" aria-labelledby="chapter-one-title">
+      <div>
+        <p class="eyebrow">01 — REPLACE_WITH_LABEL</p>
+        <h2 id="chapter-one-title">REPLACE_WITH_SECTION_TITLE</h2>
+      </div>
+      <div class="prose">
+        <p>REPLACE_WITH_SOURCE_CONTENT</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      }
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+  </script>
+</body>
+</html>
+
