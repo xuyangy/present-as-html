@@ -57,6 +57,26 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--no-scroll",
+        dest="scroll",
+        action="store_false",
+        help=(
+            "Skip the scroll pass. By default the page is scrolled to the bottom "
+            "and back before inspection so IntersectionObserver reveals fire; "
+            "without it, scroll-revealed sections are captured still hidden."
+        ),
+    )
+    parser.add_argument(
+        "--no-contact-sheet",
+        dest="contact_sheet",
+        action="store_false",
+        help=(
+            "Skip contact-sheet.png. By default one sheet tiles the above-the-fold "
+            "view of every mode and viewport, so a single image read replaces one "
+            "read per capture."
+        ),
+    )
+    parser.add_argument(
         "--wait-ms",
         type=int,
         default=900,
@@ -69,6 +89,77 @@ def build_parser() -> argparse.ArgumentParser:
         help="Navigation timeout (default: 15000)",
     )
     return parser
+
+
+TILE_HEIGHT = 460
+
+
+def build_contact_sheet(browser, output_dir: Path, results: list[dict[str, Any]]) -> Path | None:
+    """Tile every above-the-fold capture into one PNG.
+
+    One image read then replaces one read per capture. The sheet is a squint
+    test: it shows opening composition, colour scheme, and gross layout across
+    modes and widths. Open the individual full-page captures for craft detail.
+    """
+    tiles = [item for item in results if item.get("fold")]
+    if not tiles:
+        return None
+
+    rows: dict[str, list[dict[str, Any]]] = {}
+    for item in tiles:
+        rows.setdefault(item["mode"], []).append(item)
+
+    def cell(item: dict[str, Any]) -> str:
+        width, height = item["viewport"]["width"], item["viewport"]["height"]
+        scaled = max(80, round(TILE_HEIGHT * width / height))
+        flags = []
+        if item["horizontalOverflow"]:
+            flags.append("OVERFLOW")
+        if item["hiddenContent"]:
+            flags.append(f"{len(item['hiddenContent'])} HIDDEN")
+        if item["consoleErrors"] or item["pageErrors"]:
+            flags.append("JS ERROR")
+        badge = (
+            f'<b class="flag">{" · ".join(flags)}</b>' if flags else '<b class="ok">ok</b>'
+        )
+        return (
+            f'<figure style="width:{scaled}px">'
+            f'<img src="{Path(item["fold"]).name}" width="{scaled}" height="{TILE_HEIGHT}" alt="">'
+            f'<figcaption>{width}&times;{height} {badge}</figcaption>'
+            f"</figure>"
+        )
+
+    body = "".join(
+        f'<section><h2>{mode}</h2><div class="row">'
+        + "".join(cell(item) for item in items)
+        + "</div></section>"
+        for mode, items in rows.items()
+    )
+    sheet_html = output_dir / "contact-sheet.html"
+    sheet_html.write_text(
+        "<!doctype html><meta charset='utf-8'><style>"
+        "body{margin:0;padding:14px;background:#20242a;color:#e8edf2;"
+        "font:12px/1.4 ui-sans-serif,system-ui,sans-serif}"
+        "section{margin-bottom:14px}"
+        "h2{margin:0 0 6px;font:600 11px/1 ui-monospace,monospace;"
+        "letter-spacing:.14em;text-transform:uppercase;color:#8fa3b0}"
+        ".row{display:flex;gap:10px;align-items:flex-start}"
+        "figure{margin:0}"
+        "img{display:block;border:1px solid #3a444e;object-fit:cover;object-position:top}"
+        "figcaption{padding-top:4px;font:11px/1.3 ui-monospace,monospace;color:#8fa3b0}"
+        ".flag{color:#ffb45c}.ok{color:#7fd6a2;font-weight:400}"
+        "</style>" + body,
+        encoding="utf-8",
+    )
+
+    page = browser.new_page(viewport={"width": 1600, "height": 900})
+    page.goto(sheet_html.as_uri(), wait_until="load")
+    page.wait_for_timeout(250)
+    sheet_png = output_dir / "contact-sheet.png"
+    page.locator("body").screenshot(path=str(sheet_png))
+    page.close()
+    sheet_html.unlink(missing_ok=True)
+    return sheet_png
 
 
 def main() -> int:
@@ -146,6 +237,26 @@ def main() -> int:
                           ));
                         }"""
                     )
+                    if args.scroll:
+                        # Scroll-revealed sections stay at opacity 0 until an
+                        # IntersectionObserver fires. Walk the page so the captures
+                        # and the hidden-content check see the settled state.
+                        page.evaluate(
+                            """async () => {
+                              const pause = ms => new Promise(r => setTimeout(r, ms));
+                              const step = Math.max(200, window.innerHeight * 0.8);
+                              let y = 0;
+                              for (let guard = 0; guard < 400; guard += 1) {
+                                const limit = document.documentElement.scrollHeight;
+                                if (y >= limit) break;
+                                window.scrollTo(0, y);
+                                await pause(50);
+                                y += step;
+                              }
+                              window.scrollTo(0, 0);
+                              await pause(150);
+                            }"""
+                        )
                     page.wait_for_timeout(max(0, args.wait_ms))
                     metrics = page.evaluate(
                         """() => {
@@ -211,7 +322,38 @@ def main() -> int:
                             .filter(visible)
                             .filter(element => !accessibleName(element))
                             .map(identify);
+                          // Substantial blocks left effectively invisible after the
+                          // page has settled: a reveal whose observer never fired, or
+                          // content gated behind script that did not run. Deliberate
+                          // disclosure (details, dialog, hidden, aria-hidden) is exempt,
+                          // and the threshold is opacity 0.05 so mid-transition
+                          // elements are not reported.
+                          const reported = [];
+                          const hiddenContent = [...document.querySelectorAll(
+                            'main *, article *, section *'
+                          )]
+                            .filter(element => {
+                              const rect = element.getBoundingClientRect();
+                              if (rect.width * rect.height < 15000) return false;
+                              const style = getComputedStyle(element);
+                              if (style.display === 'none') return false;
+                              return parseFloat(style.opacity) < 0.05 ||
+                                style.visibility === 'hidden';
+                            })
+                            .filter(element => !element.closest(
+                              '[hidden], [aria-hidden="true"], details:not([open]), ' +
+                              'dialog:not([open])'
+                            ))
+                            .filter(element => {
+                              // keep only the outermost element of each hidden subtree
+                              if (reported.some(seen => seen.contains(element))) return false;
+                              reported.push(element);
+                              return true;
+                            })
+                            .slice(0, 12)
+                            .map(identify);
                           return {
+                            hiddenContent,
                             title: document.title,
                             viewportWidth: root.clientWidth,
                             documentWidth: Math.max(root.scrollWidth, body?.scrollWidth || 0),
@@ -224,13 +366,19 @@ def main() -> int:
                     overflow = metrics["documentWidth"] > metrics["viewportWidth"] + 1
                     screenshot = output_dir / f"{mode}-{width}x{height}.png"
                     page.screenshot(path=str(screenshot), full_page=True)
+                    fold = None
+                    if args.contact_sheet:
+                        fold = output_dir / f"{mode}-{width}x{height}-fold.png"
+                        page.screenshot(path=str(fold), full_page=False)
                     results.append(
                         {
                             "mode": mode,
                             "viewport": {"width": width, "height": height},
                             "screenshot": str(screenshot),
+                            "fold": str(fold) if fold else None,
                             "metrics": metrics,
                             "horizontalOverflow": overflow,
+                            "hiddenContent": metrics.pop("hiddenContent"),
                             "brokenImages": metrics.pop("brokenImages"),
                             "unnamedControls": metrics.pop("unnamedControls"),
                             "consoleErrors": sorted(set(console_errors)),
@@ -239,6 +387,7 @@ def main() -> int:
                         }
                     )
                     page.close()
+            sheet = build_contact_sheet(browser, output_dir, results) if args.contact_sheet else None
             browser.close()
     except PlaywrightError as exc:
         print(f"Browser review could not run: {exc}", file=sys.stderr)
@@ -246,6 +395,7 @@ def main() -> int:
 
     failures = sum(
         bool(item["horizontalOverflow"])
+        + len(item["hiddenContent"])
         + len(item["brokenImages"])
         + len(item["unnamedControls"])
         + len(item["consoleErrors"])
@@ -257,12 +407,16 @@ def main() -> int:
         "page": str(page_path),
         "viewports": [f"{width}x{height}" for width, height in viewports],
         "modes": list(modes),
+        "scrolled": bool(args.scroll),
+        "contactSheet": str(sheet) if sheet else None,
         "failures": failures,
         "results": results,
     }
     report_path = output_dir / "review-report.json"
     report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
 
+    if sheet:
+        print(f"Contact sheet (read this first): {sheet}")
     if failures:
         print(f"REVIEW FAILED: {failures} browser finding(s); see {report_path}")
         return 1

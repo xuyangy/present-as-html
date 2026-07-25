@@ -34,6 +34,17 @@
 
     * { box-sizing: border-box; }
 
+    /* Grid and flex children default to min-width:auto, so one long code line,
+       identifier, URL, or table sizes the track to its content and widens the
+       whole page instead of scrolling. Repeat this for every grid or flex
+       container you add. */
+    .hero > *, .chapter > * { min-width: 0; }
+
+    /* Wide content scrolls inside its own region rather than overflowing the
+       page. Keep role="region" tabindex="0" aria-label on the element so
+       keyboard users can reach the scroll area. */
+    .scroll-x { overflow-x: auto; }
+
     html { scroll-behavior: smooth; }
 
     body {
@@ -77,6 +88,9 @@
       font-family: ui-sans-serif, system-ui, sans-serif;
       line-height: 0.96;
       letter-spacing: -0.055em;
+      /* Display type is large enough that a single long word — a compound
+         title, identifier, or URL — overflows a narrow viewport. */
+      overflow-wrap: break-word;
     }
 
     h1 { font-size: clamp(3.2rem, 10vw, 9.5rem); }
@@ -96,6 +110,12 @@
 
     .lede,
     .prose { max-width: var(--measure); }
+
+    /* Flow spacing. Components usually carry `margin: 0` at (0,1,1) specificity,
+       which silently outranks a (0,1,0) flow rule and collapses the vertical
+       rhythm wherever a figure, list, table, or blockquote appears. Doubling the
+       class lifts this to (0,2,0) so the spine keeps winning. */
+    .prose.prose > * + * { margin-top: 1.1em; }
 
     .lede {
       margin-top: 2rem;

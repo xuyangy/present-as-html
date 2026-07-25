@@ -7,6 +7,22 @@ description: Transform supplied text, notes, reports, articles, explanations, or
 
 Turn source material into a memorable web page whose visual structure clarifies the ideas. Treat the text as editorial content, not as copy to pour into generic cards.
 
+## Choose a depth
+
+Pick a depth before step 1 and record it in the Design Read. Depth governs how much of this skill you load, how ambitious the page is, and how hard you verify. It never governs fidelity to the source.
+
+| Depth | Load | Plan | Verify |
+| --- | --- | --- | --- |
+| `sketch` | this file plus one recipe | a three-line Design Read: page type, form source, recipe | `check_html.py`, then one look at 375 px and 1440 px |
+| `standard` | plus [Editorial Planning](references/editorial-planning.md) and [Content-Led Design Directions](references/design-directions.md) | full Design Read plus a section cadence | `check_html.py`, then `review_html.py --modes normal` and read its contact sheet; resolve P0 and P1 |
+| `full` | plus [Design Playbook](references/design-playbook.md), [Section Composition Grammar](references/composition-grammar.md), and the specialist references the content earns | plus a Design System Declaration and a representative slice | `review_html.py --modes all`, read the contact sheet, then open individual captures for craft; keyboard pass, JavaScript-disabled pass, print preview, and a source-fidelity check |
+
+Default to `standard`. Choose `full` when the source is long or dense, the page needs print output, several sections risk becoming interchangeable, or brand identity is at stake. Drop to `sketch` when the user asks for something quick, rough, or provisional, or when one screen carries the whole source. An explicit request from the user overrides these rules.
+
+Two costs dominate and neither is reading: generating the page itself, and every tool round-trip taken after it exists, because the page stays in context for all of them. So batch inspection rather than iterating one observation at a time, prefer the contact sheet to reading captures individually, and run `--modes normal` while iterating and `--modes all` once at the end.
+
+Depth never licenses invented facts, dropped source material, unreachable controls, or an undisclosed change in fidelity. A `sketch` page is smaller and less verified; it is not less honest. Name the depth in the handoff so the user can ask for more.
+
 ## Workflow
 
 1. Read all supplied content and identify:
@@ -15,9 +31,9 @@ Turn source material into a memorable web page whose visual structure clarifies 
    - the narrative sequence;
    - facts, quotes, comparisons, processes, hierarchies, and calls to action;
    - claims that must not be embellished.
-2. Create a compact Design Read before coding: page type, audience, reading goal, content mode, design context, visual language, form source, signature investment, expressive temperature, layout width, visual variance, information density, motion intensity, asset dependence, and constraints. Read [Editorial Planning](references/editorial-planning.md) for the modes and template. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md).
-3. Read the [Design Playbook](references/design-playbook.md) for substantial pages, then choose one coherent visual concept derived from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas. Keep structure, density, layout, expressive temperature, and aesthetics as separate decisions. If the user supplies no visual direction, read [Content-Led Design Directions](references/design-directions.md), select a content-appropriate recipe, and load only that recipe file. When the recipe needs more range, select at most one source-earned extension from [Content-Safe Expressive Techniques](references/expressive-techniques.md).
-4. Map purposeful sections. Give every section a distinct communication job, identify the source material it must preserve, and plan its energy and contrast role. For a substantial page, choose content-shaped contracts from [Section Composition Grammar](references/composition-grammar.md) before coding.
+2. Create a compact Design Read before coding: page type, audience, reading goal, content mode, design context, visual language, form source, signature investment, expressive temperature, layout width, visual variance, information density, motion intensity, asset dependence, and constraints. At `standard` and `full`, read [Editorial Planning](references/editorial-planning.md) for the modes and template; at `sketch`, record only page type, form source, and recipe. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md) at any depth.
+3. At `full`, read the [Design Playbook](references/design-playbook.md). At every depth, choose one coherent visual concept derived from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas. Keep structure, density, layout, expressive temperature, and aesthetics as separate decisions. If the user supplies no visual direction, read [Content-Led Design Directions](references/design-directions.md), select a content-appropriate recipe, and load only that recipe file. When the recipe needs more range, select at most one source-earned extension from [Content-Safe Expressive Techniques](references/expressive-techniques.md).
+4. Map purposeful sections. Give every section a distinct communication job, identify the source material it must preserve, and plan its energy and contrast role. At `full`, choose content-shaped contracts from [Section Composition Grammar](references/composition-grammar.md) before coding.
 5. Decide which ideas benefit from a visual form:
    - comparison or repeated values → table, bars, or small multiples;
    - verified metrics, ranks, or specifications → metric stage, ledger, ranked measure, or specification sheet;
@@ -29,11 +45,13 @@ Turn source material into a memorable web page whose visual structure clarifies 
    - mood or setting → image or illustration;
    - optional detail → disclosure, tabs, tooltip, or modal.
 6. Choose an asset mode: no external images, user-provided assets, honest placeholders, sourced assets, or generated assets. For consequential images, screenshots, scans, or diagrams, define their destination and fidelity through [Media Framing and Fidelity](references/media-framing.md) before transforming or generating them. When real external assets are required, use [Asset Sourcing and Selection](references/asset-sourcing.md) to compare, verify, and record candidates. Do not treat code-native diagrams and external images as substitutes for each other.
-7. For a long or visually risky page, build the opening plus one representative section first and inspect it as the style anchor. Continue without a user checkpoint unless a choice would materially change the requested result.
+7. At `full`, build the opening plus one representative section first and inspect it as the style anchor. Continue without a user checkpoint unless a choice would materially change the requested result.
 8. Build the page as a self-contained `index.html` unless the user requests a project or framework. Start from [the page shell](assets/page-shell.html) when useful, but replace its placeholder visual language rather than merely recoloring it.
-9. Inspect the result in a browser at desktop and mobile widths. When Python Playwright and Chromium are available, run `python3 scripts/review_html.py <path-to-html>` with the bundled [browser reviewer](scripts/review_html.py) to capture normal and reduced-motion viewports, console errors, failed requests, broken images, unnamed controls, and horizontal overflow. For reports and guides, use `--modes all` to include print media. Inspect its screenshots rather than trusting the report alone. Otherwise use the runtime-native browser and disclose any remaining visual-QA limitation.
+9. Inspect the result in a browser at desktop and mobile widths. When Python Playwright and Chromium are available, run `python3 scripts/review_html.py <path-to-html>` with the bundled [browser reviewer](scripts/review_html.py). It reports console errors, failed requests, broken images, unnamed controls, horizontal overflow, and hidden content — substantial blocks left invisible because a reveal never fired or script did not run. It scrolls the page before capturing so `IntersectionObserver` reveals settle; pass `--no-scroll` only to inspect the pre-reveal state deliberately.
+
+   Read `contact-sheet.png` first: it tiles every mode and viewport into one image, so a single look replaces one per capture. Open individual full-page captures afterwards for craft detail. Iterate with `--modes normal`, and run `--modes all` once at the end to add print media. Never trust the report alone. Without Playwright, use the runtime-native browser and disclose any remaining visual-QA limitation.
 10. Run `python3 scripts/check_html.py <path-to-html>` and use [Severity-Ranked Quality Checks](references/quality-checks.md). Resolve every P0 plus relevant P1 and P2 findings.
-11. Deliver the HTML file and briefly describe its visual concept and interactions.
+11. Deliver the HTML file, name the depth you worked at, and briefly describe its visual concept and interactions.
 
 ## Preserve the source
 

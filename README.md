@@ -32,6 +32,22 @@ app with real state and backend logic, this is the wrong skill.
 - Optionally tell it your visual direction ("make it feel like a museum field guide," "keep it
   spare and Swiss," "match our brand colors"). If you don't, it picks a content-appropriate style
   itself.
+- Optionally set the **depth** (below). If you don't, it picks one from the source.
+
+### Depth
+
+Depth controls how much of the reference library gets loaded, how ambitious the page is, and how
+hard it's verified. It never affects fidelity to your source — a shallower page is smaller and
+less verified, not less honest.
+
+| Depth | Ask for it with | What you get |
+| --- | --- | --- |
+| `sketch` | "quick," "rough," "draft" | One recipe, minimal planning, static checks plus a look at two widths. Fastest and cheapest. |
+| `standard` | *the default* | Full Design Read and section cadence, browser review at three widths, P0/P1 resolved. |
+| `full` | "thorough," "make it really good," or a long/dense source | Adds the design playbook and composition grammar, a representative-slice checkpoint, print media, keyboard and no-JavaScript passes, and a source-fidelity check. Noticeably slower and more expensive. |
+
+It escalates to `full` on its own when the source is long or dense, the page needs print output,
+or brand identity is at stake. Your explicit request always wins.
 
 ## 3. What happens when it runs
 
@@ -123,7 +139,8 @@ this skill produced:
 
 ```bash
 # Visual/browser QA: screenshots at mobile/tablet/desktop widths, reduced-motion pass,
-# console errors, failed requests, broken images, overflow. Requires Python + Playwright/Chromium.
+# console errors, failed requests, broken images, overflow, and hidden content.
+# Requires Python + Playwright/Chromium.
 python3 scripts/review_html.py path/to/index.html
 python3 scripts/review_html.py path/to/index.html --modes all   # adds print-media check
 
@@ -131,6 +148,14 @@ python3 scripts/review_html.py path/to/index.html --modes all   # adds print-med
 # leftover placeholder text, unlabeled controls, etc.
 python3 scripts/check_html.py path/to/index.html
 ```
+
+The reviewer scrolls the page before capturing, so `IntersectionObserver` reveals have fired by
+the time it looks (`--no-scroll` inspects the pre-reveal state instead). It writes
+`contact-sheet.png` — every mode and viewport tiled into one image with a per-tile status badge —
+so the agent can review the whole matrix in a single look rather than opening each capture
+(`--no-contact-sheet` skips it). A `hiddenContent` finding means a substantial block was still
+invisible after the page settled: usually a reveal whose observer never fired, or content gated
+behind script that did not run.
 
 Findings are triaged P0 (must fix) through P3, per
 [`references/quality-checks.md`](references/quality-checks.md). The agent resolves P0s and

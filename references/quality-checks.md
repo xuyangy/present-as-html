@@ -66,7 +66,7 @@ Address after P0–P2:
 
 1. Compare the output against the source-preservation list.
 2. Run `python3 scripts/check_html.py <path-to-html>` and resolve every P0 plus relevant P1/P2 findings.
-3. Inspect at approximately 375 px, 768 px, and 1440 px; include unusually long headings and URLs. When Python Playwright and Chromium are available, run `python3 scripts/review_html.py <path-to-html>` and inspect both its normal and reduced-motion screenshots plus `review-report.json`.
+3. Inspect at approximately 375 px, 768 px, and 1440 px; include unusually long headings and URLs. When Python Playwright and Chromium are available, run `python3 scripts/review_html.py <path-to-html>`, read `contact-sheet.png` first, then open individual captures for craft detail and check `review-report.json`. Treat any `hiddenContent` entry as a P0 until proven deliberate: it means a substantial block stayed invisible after the page settled.
 4. Navigate by keyboard and verify visible focus, reading order, control labels, and state announcements.
 5. Test reduced motion. For effects-heavy pages, also test the manual static mode and JavaScript-disabled content state.
 6. Inspect print preview for reports, guides, briefs, and reference pages.
