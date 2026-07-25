@@ -62,13 +62,16 @@ The agent works through a fixed pipeline (full detail in `SKILL.md`):
 4. **Chooses visual forms** for the content — tables/bars for comparisons, timelines for
    sequence, diagrams for process/flow, maps for places, image or illustration for mood, etc.
 5. **Decides on imagery** — none, your assets, honest placeholders, sourced real assets, or
-   generated assets, depending on what the content needs.
+   generated assets. **The default is none**: pages are built from typography, layout, CSS, and
+   inline SVG, so unless you ask, expect no photos or generated images. Say "generate images",
+   "add illustrations", or "make it image-led" and it switches modes and produces them.
 6. **Builds** a self-contained `index.html` (inline CSS/JS by default, no build step) unless you
    ask for a project/framework structure.
 7. **Reviews it in a browser** — checks desktop and mobile widths, reduced-motion behavior,
    console errors, broken assets, overflow — using the bundled scripts when available.
 8. **Runs an automated quality check** and fixes flagged issues.
-9. **Delivers the HTML file** with a short description of the visual concept and interactions.
+9. **Delivers the HTML file** with a short description of the visual concept, the interactions, and
+   the imagery mode it used — so "no external images" arrives as a stated choice you can override.
 
 For long or visually ambitious pages, it typically builds the opening plus one representative
 section first, checks that it looks right, then continues — it won't stop and wait for your
@@ -117,7 +120,9 @@ the source earns it.
 
 ## 7. Images and diagrams
 
-- Images are used only when they add evidence, orientation, or mood — not decoration.
+- **No external images by default.** Unless you ask for imagery or supply it, the page is
+  typography, layout, CSS, and inline SVG. Ask and it generates or sources real assets instead.
+- Unasked-for images are used only when they add evidence, orientation, or mood — not decoration.
 - Real brands/products get real logos/screenshots, never faked marks.
 - Supplied screenshots/charts/documents are preserved or reframed, not stylistically regenerated.
 - Diagrams are built natively in HTML/CSS or SVG (not baked into images), so labels stay legible,

@@ -31,7 +31,7 @@ Depth never licenses invented facts, dropped source material, unreachable contro
    - the narrative sequence;
    - facts, quotes, comparisons, processes, hierarchies, and calls to action;
    - claims that must not be embellished.
-2. Create a compact Design Read before coding: page type, audience, reading goal, content mode, design context, visual language, form source, signature investment, expressive temperature, layout width, visual variance, information density, motion intensity, asset dependence, and constraints. At `standard` and `full`, read [Editorial Planning](references/editorial-planning.md) for the modes and template; at `sketch`, record only page type, form source, and recipe. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md) at any depth.
+2. Create a compact Design Read before coding: page type, audience, reading goal, content mode, design context, visual language, form source, signature investment, expressive temperature, layout width, visual variance, information density, motion intensity, asset dependence, asset mode, and constraints. At `standard` and `full`, read [Editorial Planning](references/editorial-planning.md) for the modes and template; at `sketch`, record only page type, form source, recipe, and asset mode. When an existing brand, product, publication, design system, or current external fact materially shapes the page, read [Design Context and Provenance](references/design-context.md) at any depth.
 3. At `full`, read the [Design Playbook](references/design-playbook.md). At every depth, choose one coherent visual concept derived from the subject matter, such as field notes, museum labels, a technical blueprint, a magazine feature, or an annotated atlas. Keep structure, density, layout, expressive temperature, and aesthetics as separate decisions. If the user supplies no visual direction, read [Content-Led Design Directions](references/design-directions.md), select a content-appropriate recipe, and load only that recipe file. When the recipe needs more range, select at most one source-earned extension from [Content-Safe Expressive Techniques](references/expressive-techniques.md).
 4. Map purposeful sections. Give every section a distinct communication job, identify the source material it must preserve, and plan its energy and contrast role. At `full`, choose content-shaped contracts from [Section Composition Grammar](references/composition-grammar.md) before coding.
 5. Decide which ideas benefit from a visual form:
@@ -44,14 +44,18 @@ Depth never licenses invented facts, dropped source material, unreachable contro
    - hierarchy → tree or nested composition;
    - mood or setting → image or illustration;
    - optional detail → disclosure, tabs, tooltip, or modal.
-6. Choose an asset mode: no external images, user-provided assets, honest placeholders, sourced assets, or generated assets. For consequential images, screenshots, scans, or diagrams, define their destination and fidelity through [Media Framing and Fidelity](references/media-framing.md) before transforming or generating them. When real external assets are required, use [Asset Sourcing and Selection](references/asset-sourcing.md) to compare, verify, and record candidates. Do not treat code-native diagrams and external images as substitutes for each other.
+6. Choose an asset mode and record it in the Design Read: `none` (typography and code-native visuals only), `user-provided`, `placeholder`, `sourced`, or `generated`. Default to `none` — most content-led pages are carried by type, tables, CSS, and SVG, so external raster imagery is opt-in rather than expected. Three things select another mode: the user supplies assets, the user asks for imagery, or the content cannot be understood without a real image, screenshot, scan, map, or artifact.
+
+   Treat an explicit user request for imagery — "generate images", "add illustrations", "include photos", "make it image-led" — as having already established the need. Select `generated` or `sourced` accordingly and proceed; do not re-litigate whether imagery is warranted or answer such a request with CSS shapes and SVG instead. The honesty rules still bind: no fabricated evidence, identity, screenshots, or metrics, and generated imagery stays labeled as illustration.
+
+   For consequential images, screenshots, scans, or diagrams, define their destination and fidelity through [Media Framing and Fidelity](references/media-framing.md) before transforming or generating them. When real external assets are required, use [Asset Sourcing and Selection](references/asset-sourcing.md) to compare, verify, and record candidates. Do not treat code-native diagrams and external images as substitutes for each other.
 7. At `full`, build the opening plus one representative section first and inspect it as the style anchor. Continue without a user checkpoint unless a choice would materially change the requested result.
 8. Build the page as a self-contained `index.html` unless the user requests a project or framework. Start from [the page shell](assets/page-shell.html) when useful, but replace its placeholder visual language rather than merely recoloring it.
 9. Inspect the result in a browser at desktop and mobile widths. When Python Playwright and Chromium are available, run `python3 scripts/review_html.py <path-to-html>` with the bundled [browser reviewer](scripts/review_html.py). It reports console errors, failed requests, broken images, unnamed controls, horizontal overflow, and hidden content — substantial blocks left invisible because a reveal never fired or script did not run. It scrolls the page before capturing so `IntersectionObserver` reveals settle; pass `--no-scroll` only to inspect the pre-reveal state deliberately.
 
    Read `contact-sheet.png` first: it tiles every mode and viewport into one image, so a single look replaces one per capture. Open individual full-page captures afterwards for craft detail. Iterate with `--modes normal`, and run `--modes all` once at the end to add print media. Never trust the report alone. Without Playwright, use the runtime-native browser and disclose any remaining visual-QA limitation.
 10. Run `python3 scripts/check_html.py <path-to-html>` and use [Severity-Ranked Quality Checks](references/quality-checks.md). Resolve every P0 plus relevant P1 and P2 findings.
-11. Deliver the HTML file, name the depth you worked at, and briefly describe its visual concept and interactions.
+11. Deliver the HTML file, name the depth you worked at, name the asset mode, and briefly describe its visual concept and interactions. Naming the asset mode is not optional: when it was `none`, say the page uses no external images so the user can ask for imagery instead of discovering its absence.
 
 ## Preserve the source
 
@@ -85,8 +89,10 @@ Apply these defaults:
 
 ## Images and diagrams
 
-- Use images only when they add evidence, orientation, mood, or explanatory value.
-- Classify proposed media as essential, supporting, or ornamental; omit ornamental media by default.
+- The default asset mode is `none`: build the page from typography, layout, CSS, and inline SVG, and expect a page with no external images unless something selects otherwise. Disclose that mode in the handoff.
+- When the user asks for imagery, that request is the justification. Switch the asset mode, plan real slots, and produce the images; the guidance below shapes *how*, not *whether*.
+- Otherwise use images only when they add evidence, orientation, mood, or explanatory value.
+- Classify proposed media as essential, supporting, or ornamental; omit ornamental media by default. Requested imagery is at least supporting — do not reclassify it as ornamental to justify dropping it.
 - Prefer user-provided and authoritative assets. For a named brand or product, use real logos, product imagery, or interface screenshots; never replace identity-critical material with CSS silhouettes or fabricated marks.
 - Default supplied screenshots, charts, documents, and interfaces to preservation or programmatic reframing; do not regenerate them merely for stylistic consistency.
 - When image search or generation tools are available and imagery materially improves the page, use them and save output beside the HTML in a clearly named asset folder. Use sourced imagery for evidence and generated imagery for non-identity-critical atmosphere or illustration.

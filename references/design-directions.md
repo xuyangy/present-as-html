@@ -89,7 +89,7 @@ Do not mix one recipe's palette, another's type, a third's radii, and a fourth's
 - **Page archetype:** narrative composition, such as atlas, timeline, or comparative story.
 - **Recipe:** page-wide visual grammar: tokens, typography, layout, media, and motion.
 - **Visual device:** local explanatory form, such as a chart, diagram, quote, or toggle.
-- **Image style:** raster rendering treatment used for a generated or sourced asset.
+- **Image style:** raster rendering treatment used for a generated or sourced asset. Record `none` when the asset mode is `none`; give it a real treatment as soon as the page carries sourced or generated imagery.
 
 Example:
 

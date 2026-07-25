@@ -1,6 +1,6 @@
 # Raster Image Generation
 
-Use this workflow only after the editorial plan establishes that generated raster imagery materially improves the page. Do not generate an image merely because a backend is available.
+Use this workflow once the asset mode is `generated`. An explicit user request for imagery establishes that mode on its own; otherwise the editorial plan must show that generated raster imagery materially improves the page. Do not generate an image merely because a backend is available, and do not withhold requested imagery because the plan would not have chosen it unprompted.
 
 Define the destination through [Media Framing and Fidelity](media-framing.md) before writing a prompt. The page slot—not a backend's favorite dimensions—determines aspect ratio, safe area, crop, and responsive behavior.
 

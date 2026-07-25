@@ -52,6 +52,7 @@ Design Read:
   information-density: 1-10
   motion-intensity: 1-10
   asset-dependence: 1-10
+  asset-mode: none | user-provided | placeholder | sourced | generated
   constraints: accessibility, offline use, brand, viewport, supplied assets
 ```
 
@@ -116,7 +117,7 @@ Add a table of contents or chapter navigation when it improves orientation. Omit
 
 ## Plan assets
 
-Choose one or combine deliberately:
+Choose one or combine deliberately, and record the result as `asset-mode` in the Design Read. **None** is the default; a user request for imagery selects **Generated** or **Sourced** without further justification, and high asset dependence or identity-critical material selects **User-provided** or **Sourced**.
 
 - **None:** typography, tables, CSS, Canvas, and SVG are sufficient.
 - **User-provided:** preserve the files and their intended role.
