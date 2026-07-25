@@ -1,0 +1,4 @@
+interface:
+  display_name: "Present as HTML"
+  short_description: "Turn text into a polished visual webpage"
+  default_prompt: "Use $present-as-html to turn this text into a content-led, polished, responsive HTML page."
