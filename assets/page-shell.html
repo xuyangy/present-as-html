@@ -7,54 +7,47 @@
   <title>REPLACE_WITH_TITLE</title>
   <style>
     :root {
-      color-scheme: light dark;
-      --paper: #f3efe5;
-      --ink: #1d1c19;
-      --muted: #69655c;
-      --accent: #bc4936;
-      --accent-on: #ffffff;
-      --accent-gradient: linear-gradient(135deg, var(--accent) 0%, oklch(from var(--accent) calc(l + 0.02) calc(c + 0.02) calc(h - 80)) 100%);
-      --line: rgba(29, 28, 25, 0.18);
+      /* Replace these neutral roles with the selected recipe or brand system. */
+      color-scheme: light;
+      --page: #ffffff;
+      --text: #171717;
+      --muted: #5f5f5f;
+      --accent: #2255cc;
+      --line: #d8d8d8;
       --measure: 68ch;
-      --gutter: clamp(1rem, 4vw, 4.5rem);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --paper: #191817;
-        --ink: #ece8de;
-        --muted: #a49e93;
-        --accent: #e0684e;
-        --accent-on: #191817;
-        --line: rgba(236, 232, 222, 0.18);
-        /* On dark grounds, lift lightness and chroma at both ends so the gradient glows instead of muting. */
-        --accent-gradient: linear-gradient(135deg, oklch(from var(--accent) calc(l + 0.06) calc(c + 0.04) h) 0%, oklch(from var(--accent) calc(l + 0.16) calc(c + 0.11) calc(h - 80)) 100%);
-      }
+      --gutter: clamp(1rem, 4vw, 4rem);
     }
 
     * { box-sizing: border-box; }
 
-    /* Grid and flex children default to min-width:auto, so one long code line,
-       identifier, URL, or table sizes the track to its content and widens the
-       whole page instead of scrolling. Repeat this for every grid or flex
-       container you add. */
-    .hero > *, .chapter > * { min-width: 0; }
-
-    /* Wide content scrolls inside its own region rather than overflowing the
-       page. Keep role="region" tabindex="0" aria-label on the element so
-       keyboard users can reach the scroll area. */
-    .scroll-x { overflow-x: auto; }
-
     html { scroll-behavior: smooth; }
 
+    body,
+    h1,
+    h2,
+    p { margin: 0; }
+
     body {
-      margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font: 400 clamp(1rem, 0.95rem + 0.2vw, 1.15rem)/1.65 ui-serif, Georgia, serif;
+      background: var(--page);
+      color: var(--text);
+      font: 400 clamp(1rem, 0.97rem + 0.15vw, 1.125rem)/1.65 system-ui, sans-serif;
       text-rendering: optimizeLegibility;
       text-wrap: pretty;
     }
+
+    img,
+    svg,
+    video {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* Repeat min-width: 0 for children of every grid or flex container added. */
+    .hero > *,
+    .chapter > * { min-width: 0; }
+
+    /* Keep role="region", tabindex="0", and an accessible name on wide scrollers. */
+    .scroll-x { overflow-x: auto; }
 
     .skip-link {
       position: fixed;
@@ -62,8 +55,8 @@
       top: 0.75rem;
       left: 0.75rem;
       padding: 0.6rem 0.85rem;
-      background: var(--ink);
-      color: var(--paper);
+      background: var(--text);
+      color: var(--page);
       transform: translateY(-160%);
     }
 
@@ -71,63 +64,37 @@
 
     .hero,
     .chapter {
-      padding: clamp(4rem, 10vw, 9rem) var(--gutter);
+      padding: clamp(3rem, 8vw, 7rem) var(--gutter);
     }
 
-    .hero {
-      min-height: 85svh;
-      display: grid;
-      align-content: end;
-      border-bottom: 1px solid var(--line);
-    }
+    .hero { border-bottom: 1px solid var(--line); }
 
     h1,
     h2 {
-      max-width: 14ch;
-      margin: 0.25em 0;
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      line-height: 0.96;
-      letter-spacing: -0.055em;
-      /* Display type is large enough that a single long word — a compound
-         title, identifier, or URL — overflows a narrow viewport. */
-      overflow-wrap: break-word;
+      max-width: 18ch;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
     }
 
-    h1 { font-size: clamp(3.2rem, 10vw, 9.5rem); }
-    h2 { font-size: clamp(2.2rem, 6vw, 5.5rem); }
-
-    /* Emphasis device for a few consequential words or phrases (headings or body copy). */
-    .gradient-text { color: var(--accent); }
-
-    @supports (color: oklch(from red l c h)) {
-      .gradient-text {
-        background: var(--accent-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-    }
+    h1 { font-size: clamp(2.5rem, 7vw, 6rem); }
+    h2 { font-size: clamp(1.75rem, 4vw, 3.5rem); }
 
     .lede,
     .prose { max-width: var(--measure); }
 
-    /* Flow spacing. Components usually carry `margin: 0` at (0,1,1) specificity,
-       which silently outranks a (0,1,0) flow rule and collapses the vertical
-       rhythm wherever a figure, list, table, or blockquote appears. Doubling the
-       class lifts this to (0,2,0) so the spine keeps winning. */
+    /* (0,2,0) so component margin: 0 rules can't collapse the flow spine. */
     .prose.prose > * + * { margin-top: 1.1em; }
 
     .lede {
       margin-top: 2rem;
       color: var(--muted);
-      font-size: clamp(1.15rem, 2vw, 1.6rem);
+      font-size: clamp(1.125rem, 2vw, 1.5rem);
     }
 
     .chapter {
-      min-height: 70svh;
       display: grid;
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: clamp(2rem, 7vw, 8rem);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      gap: clamp(2rem, 6vw, 6rem);
       border-bottom: 1px solid var(--line);
     }
 
@@ -146,12 +113,8 @@
 
     @media print {
       body { background: #fff; color: #000; }
-      .hero, .chapter { min-height: auto; break-inside: avoid; }
-      .gradient-text {
-        background: none;
-        -webkit-text-fill-color: currentColor;
-        color: inherit;
-      }
+      .skip-link { display: none; }
+      .hero, .chapter { break-inside: avoid; }
     }
   </style>
 </head>

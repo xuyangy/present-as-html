@@ -16,14 +16,46 @@ CSS_URL = re.compile(r"url\(\s*(['\"]?)([^'\")]+)\1\s*\)", re.IGNORECASE)
 
 
 def srcset_urls(value: str) -> list[str]:
-    """Return candidate URLs from a conventional comma-separated srcset."""
-    if re.search(r"(?:^|,\s*)data:", value, re.IGNORECASE):
-        return []
+    """Return candidate URLs using the HTML srcset tokenization shape."""
     urls: list[str] = []
-    for candidate in value.split(","):
-        parts = candidate.strip().split()
-        if parts and parts[0]:
-            urls.append(parts[0])
+    position = 0
+    ascii_whitespace = " \t\n\f\r"
+
+    while position < len(value):
+        while position < len(value) and (
+            value[position] in ascii_whitespace or value[position] == ","
+        ):
+            position += 1
+        if position >= len(value):
+            break
+
+        url_start = position
+        while position < len(value) and value[position] not in ascii_whitespace:
+            position += 1
+        url = value[url_start:position]
+
+        # A trailing comma ends a descriptor-less candidate. Other commas are
+        # part of the URL, as they commonly are in data URLs.
+        if url.endswith(","):
+            url = url.rstrip(",")
+            if url:
+                urls.append(url)
+            continue
+
+        parentheses = 0
+        while position < len(value):
+            character = value[position]
+            if character == "(":
+                parentheses += 1
+            elif character == ")" and parentheses:
+                parentheses -= 1
+            elif character == "," and not parentheses:
+                position += 1
+                break
+            position += 1
+
+        if url:
+            urls.append(url)
     return urls
 
 
@@ -54,6 +86,7 @@ class PageParser(HTMLParser):
         self.has_title = False
         self.lang: str | None = None
         self._in_title = False
+        self._svg_labelled: list[bool] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         self.tags.append(tag)
@@ -65,7 +98,7 @@ class PageParser(HTMLParser):
             self.ids.add(element_id)
         if tag == "html":
             self.lang = values.get("lang")
-        if tag == "title":
+        if tag == "title" and not self._svg_labelled:
             self._in_title = True
         if re.fullmatch(r"h[1-6]", tag):
             self.headings.append(int(tag[1]))
@@ -73,14 +106,14 @@ class PageParser(HTMLParser):
             self.has_viewport = True
         if tag == "img" and "alt" not in values:
             self.images_without_alt += 1
-        if (
-            tag == "svg"
-            and values.get("aria-hidden", "").lower() != "true"
-            and values.get("role", "").lower() == "img"
-            and not values.get("aria-label")
-            and not values.get("aria-labelledby")
-        ):
-            self.unlabelled_image_svgs += 1
+        if tag == "svg":
+            self._svg_labelled.append(
+                values.get("aria-hidden", "").lower() == "true"
+                or bool(values.get("aria-label"))
+                or bool(values.get("aria-labelledby"))
+            )
+        elif tag == "title" and self._svg_labelled:
+            self._svg_labelled[-1] = True
         for attribute in ("src", "href", "poster"):
             value = values.get(attribute)
             if value:
@@ -92,6 +125,9 @@ class PageParser(HTMLParser):
     def handle_endtag(self, tag: str) -> None:
         if tag == "title":
             self._in_title = False
+        if tag == "svg" and self._svg_labelled:
+            if not self._svg_labelled.pop():
+                self.unlabelled_image_svgs += 1
 
     def handle_data(self, data: str) -> None:
         if self._in_title and data.strip():
@@ -145,7 +181,7 @@ def check(page: Path) -> tuple[list[str], list[str]]:
         errors.append(f"{parser.images_without_alt} image(s) have no alt attribute")
     if parser.unlabelled_image_svgs:
         warnings.append(
-            f"{parser.unlabelled_image_svgs} SVG image(s) have no aria-label or aria-labelledby"
+            f"{parser.unlabelled_image_svgs} SVG image(s) are neither labelled nor aria-hidden"
         )
     if PLACEHOLDER.search(text):
         errors.append("Template placeholder text remains")

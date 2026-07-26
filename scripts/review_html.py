@@ -34,6 +34,22 @@ def parse_viewports(raw: str) -> list[tuple[int, int]]:
     return viewports
 
 
+def resolve_modes(raw: str) -> tuple[str, ...]:
+    if raw == "both":
+        return ("normal", "reduced")
+    if raw == "all":
+        return ("normal", "reduced", "print")
+    return (raw,)
+
+
+def resolve_javascript(raw: str) -> tuple[str, ...]:
+    return ("enabled", "disabled") if raw == "both" else (raw,)
+
+
+def resolve_color_schemes(raw: str) -> tuple[str, ...]:
+    return ("light", "dark") if raw == "both" else (raw,)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("html", type=Path, help="Local HTML file to review")
@@ -67,6 +83,24 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--javascript",
+        choices=("enabled", "disabled", "both"),
+        default="enabled",
+        help=(
+            "Capture with page JavaScript enabled, disabled, or both "
+            "(default: enabled)"
+        ),
+    )
+    parser.add_argument(
+        "--color-schemes",
+        choices=("system", "light", "dark", "both"),
+        default="system",
+        help=(
+            "Use the system color scheme, force light/dark, or capture both "
+            "(default: system)"
+        ),
+    )
+    parser.add_argument(
         "--no-contact-sheet",
         dest="contact_sheet",
         action="store_false",
@@ -91,7 +125,52 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-TILE_HEIGHT = 460
+TILE_HEIGHT = 290
+SHEET_MAX_WIDTH = 1800
+SHEET_PADDING = 14
+GROUP_GAP = 16
+CELL_GAP = 10
+GROUP_CHROME = 22
+
+
+def contact_sheet_group_width(items: list[dict[str, Any]]) -> int:
+    """Return the rendered width of one scenario group."""
+    return (
+        sum(
+            max(
+                80,
+                round(
+                    TILE_HEIGHT
+                    * item["viewport"]["width"]
+                    / item["viewport"]["height"]
+                ),
+            )
+            for item in items
+        )
+        + CELL_GAP * max(0, len(items) - 1)
+        + GROUP_CHROME
+    )
+
+
+def contact_sheet_layout(
+    groups: dict[str, list[dict[str, Any]]],
+) -> tuple[int, int]:
+    """Return scenario columns and canvas width for a readable matrix."""
+    widest_group = max(
+        contact_sheet_group_width(items)
+        for items in groups.values()
+    )
+    available = SHEET_MAX_WIDTH - 2 * SHEET_PADDING
+    columns = max(
+        1,
+        min(3, (available + GROUP_GAP) // (widest_group + GROUP_GAP)),
+    )
+    content_width = columns * widest_group + (columns - 1) * GROUP_GAP
+    canvas_width = min(
+        SHEET_MAX_WIDTH,
+        max(480, content_width + 2 * SHEET_PADDING),
+    )
+    return columns, canvas_width
 
 
 def build_contact_sheet(browser, output_dir: Path, results: list[dict[str, Any]]) -> Path | None:
@@ -107,7 +186,12 @@ def build_contact_sheet(browser, output_dir: Path, results: list[dict[str, Any]]
 
     rows: dict[str, list[dict[str, Any]]] = {}
     for item in tiles:
-        rows.setdefault(item["mode"], []).append(item)
+        label = (
+            f"{item['mode']} · {item['colorScheme']} · "
+            f"JavaScript {item['javascript']}"
+        )
+        rows.setdefault(label, []).append(item)
+    columns, canvas_width = contact_sheet_layout(rows)
 
     def cell(item: dict[str, Any]) -> str:
         width, height = item["viewport"]["width"], item["viewport"]["height"]
@@ -129,30 +213,32 @@ def build_contact_sheet(browser, output_dir: Path, results: list[dict[str, Any]]
             f"</figure>"
         )
 
-    body = "".join(
+    body = '<main class="matrix">' + "".join(
         f'<section><h2>{mode}</h2><div class="row">'
         + "".join(cell(item) for item in items)
         + "</div></section>"
         for mode, items in rows.items()
-    )
+    ) + "</main>"
     sheet_html = output_dir / "contact-sheet.html"
     sheet_html.write_text(
         "<!doctype html><meta charset='utf-8'><style>"
-        "body{margin:0;padding:14px;background:#20242a;color:#e8edf2;"
+        f"body{{margin:0;padding:{SHEET_PADDING}px;background:#20242a;color:#e8edf2;"
         "font:12px/1.4 ui-sans-serif,system-ui,sans-serif}"
-        "section{margin-bottom:14px}"
-        "h2{margin:0 0 6px;font:600 11px/1 ui-monospace,monospace;"
+        f".matrix{{display:grid;grid-template-columns:repeat({columns},max-content);"
+        f"gap:{GROUP_GAP}px;align-items:start}}"
+        "section{margin:0;padding:10px;border:1px solid #343d46;background:#252a30}"
+        "h2{margin:0 0 8px;font:600 12px/1 ui-monospace,monospace;"
         "letter-spacing:.14em;text-transform:uppercase;color:#8fa3b0}"
-        ".row{display:flex;gap:10px;align-items:flex-start}"
+        f".row{{display:flex;gap:{CELL_GAP}px;align-items:flex-start}}"
         "figure{margin:0}"
         "img{display:block;border:1px solid #3a444e;object-fit:cover;object-position:top}"
-        "figcaption{padding-top:4px;font:11px/1.3 ui-monospace,monospace;color:#8fa3b0}"
+        "figcaption{padding-top:5px;font:13px/1.3 ui-monospace,monospace;color:#a9bac5}"
         ".flag{color:#ffb45c}.ok{color:#7fd6a2;font-weight:400}"
         "</style>" + body,
         encoding="utf-8",
     )
 
-    page = browser.new_page(viewport={"width": 1600, "height": 900})
+    page = browser.new_page(viewport={"width": canvas_width, "height": 900})
     page.goto(sheet_html.as_uri(), wait_until="load")
     page.wait_for_timeout(250)
     sheet_png = output_dir / "contact-sheet.png"
@@ -188,78 +274,114 @@ def main() -> int:
 
     output_dir = (args.out or page_path.parent / "review-html").expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    if args.modes == "both":
-        modes = ("normal", "reduced")
-    elif args.modes == "all":
-        modes = ("normal", "reduced", "print")
-    else:
-        modes = (args.modes,)
+    modes = resolve_modes(args.modes)
+    javascript_modes = resolve_javascript(args.javascript)
+    color_schemes = resolve_color_schemes(args.color_schemes)
     results: list[dict[str, Any]] = []
 
     try:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
-            for mode in modes:
-                for width, height in viewports:
-                    page = browser.new_page(viewport={"width": width, "height": height})
-                    if mode == "reduced":
-                        page.emulate_media(reduced_motion="reduce")
-                    elif mode == "print":
-                        page.emulate_media(media="print", reduced_motion="reduce")
+            for javascript in javascript_modes:
+                context = browser.new_context()
+                for mode in modes:
+                    for color_scheme in color_schemes:
+                        for width, height in viewports:
+                            print(
+                                "Capture: "
+                                f"{mode}, {color_scheme}, JavaScript {javascript}, "
+                                f"{width}x{height}"
+                            )
+                            page = context.new_page()
+                            page.set_viewport_size({"width": width, "height": height})
+                            cdp = None
+                            if javascript == "disabled":
+                                cdp = context.new_cdp_session(page)
+                                cdp.send(
+                                    "Emulation.setScriptExecutionDisabled",
+                                    {"value": True},
+                                )
+                            media: dict[str, str] = {}
+                            if mode == "reduced":
+                                media["reduced_motion"] = "reduce"
+                            elif mode == "print":
+                                media["media"] = "print"
+                                media["reduced_motion"] = "reduce"
+                            if color_scheme != "system":
+                                media["color_scheme"] = color_scheme
+                            if media:
+                                page.emulate_media(**media)
 
-                    console_errors: list[str] = []
-                    page_errors: list[str] = []
-                    failed_requests: list[str] = []
-                    page.on(
-                        "console",
-                        lambda message, sink=console_errors: (
-                            sink.append(message.text) if message.type == "error" else None
-                        ),
-                    )
-                    page.on("pageerror", lambda error, sink=page_errors: sink.append(str(error)))
-                    page.on(
-                        "requestfailed",
-                        lambda request, sink=failed_requests: sink.append(
-                            f"{request.url}: {request.failure}"
-                        ),
-                    )
+                            console_errors: list[str] = []
+                            page_errors: list[str] = []
+                            failed_requests: list[str] = []
+                            page.on(
+                                "console",
+                                lambda message, sink=console_errors: (
+                                    sink.append(message.text)
+                                    if message.type == "error"
+                                    else None
+                                ),
+                            )
+                            page.on(
+                                "pageerror",
+                                lambda error, sink=page_errors: sink.append(str(error)),
+                            )
+                            page.on(
+                                "requestfailed",
+                                lambda request, sink=failed_requests: sink.append(
+                                    f"{request.url}: {request.failure}"
+                                ),
+                            )
 
-                    page.goto(
-                        page_path.as_uri(),
-                        wait_until="load",
-                        timeout=args.timeout_ms,
-                    )
-                    page.evaluate(
-                        """async () => {
-                          if (document.fonts?.ready) await document.fonts.ready;
-                          await new Promise(resolve => requestAnimationFrame(
-                            () => requestAnimationFrame(resolve)
-                          ));
-                        }"""
-                    )
-                    if args.scroll:
-                        # Scroll-revealed sections stay at opacity 0 until an
-                        # IntersectionObserver fires. Walk the page so the captures
-                        # and the hidden-content check see the settled state.
-                        page.evaluate(
-                            """async () => {
-                              const pause = ms => new Promise(r => setTimeout(r, ms));
-                              const step = Math.max(200, window.innerHeight * 0.8);
-                              let y = 0;
-                              for (let guard = 0; guard < 400; guard += 1) {
-                                const limit = document.documentElement.scrollHeight;
-                                if (y >= limit) break;
-                                window.scrollTo(0, y);
-                                await pause(50);
-                                y += step;
-                              }
-                              window.scrollTo(0, 0);
-                              await pause(150);
-                            }"""
-                        )
-                    page.wait_for_timeout(max(0, args.wait_ms))
-                    metrics = page.evaluate(
-                        """() => {
+                            page.goto(
+                                page_path.as_uri(),
+                                wait_until="load",
+                                timeout=args.timeout_ms,
+                            )
+                            if javascript == "disabled":
+                                # Page scripts were disabled during parsing and load.
+                                # Re-enable the execution engine only afterwards so
+                                # Playwright can run its isolated inspection code;
+                                # skipped page scripts are not replayed.
+                                assert cdp is not None
+                                cdp.send(
+                                    "Emulation.setScriptExecutionDisabled",
+                                    {"value": False},
+                                )
+                                page.wait_for_timeout(100)
+                                cdp.detach()
+                            page.evaluate(
+                                """async () => {
+                                  if (document.fonts?.ready) await document.fonts.ready;
+                                  await new Promise(resolve => requestAnimationFrame(
+                                    () => requestAnimationFrame(resolve)
+                                  ));
+                                }"""
+                            )
+                            if args.scroll:
+                                # Scroll-revealed sections stay at opacity 0 until an
+                                # IntersectionObserver fires. Walk the page so captures
+                                # and hidden-content checks see the settled state.
+                                page.evaluate(
+                                    """async () => {
+                                      const pause = ms => new Promise(r => setTimeout(r, ms));
+                                      const step = Math.max(200, window.innerHeight * 0.8);
+                                      let y = 0;
+                                      for (let guard = 0; guard < 400; guard += 1) {
+                                        const limit = document.documentElement.scrollHeight;
+                                        if (y >= limit) break;
+                                        window.scrollTo(0, y);
+                                        await pause(50);
+                                        y += step;
+                                      }
+                                      window.scrollTo(0, 0);
+                                      await pause(150);
+                                    }"""
+                                )
+                            page.wait_for_timeout(max(0, args.wait_ms))
+                            metrics = page.evaluate(
+                                """() => {
                           const root = document.documentElement;
                           const body = document.body;
                           const visible = element => {
@@ -362,32 +484,45 @@ def main() -> int:
                             unnamedControls,
                           };
                         }"""
-                    )
-                    overflow = metrics["documentWidth"] > metrics["viewportWidth"] + 1
-                    screenshot = output_dir / f"{mode}-{width}x{height}.png"
-                    page.screenshot(path=str(screenshot), full_page=True)
-                    fold = None
-                    if args.contact_sheet:
-                        fold = output_dir / f"{mode}-{width}x{height}-fold.png"
-                        page.screenshot(path=str(fold), full_page=False)
-                    results.append(
-                        {
-                            "mode": mode,
-                            "viewport": {"width": width, "height": height},
-                            "screenshot": str(screenshot),
-                            "fold": str(fold) if fold else None,
-                            "metrics": metrics,
-                            "horizontalOverflow": overflow,
-                            "hiddenContent": metrics.pop("hiddenContent"),
-                            "brokenImages": metrics.pop("brokenImages"),
-                            "unnamedControls": metrics.pop("unnamedControls"),
-                            "consoleErrors": sorted(set(console_errors)),
-                            "pageErrors": sorted(set(page_errors)),
-                            "failedRequests": sorted(set(failed_requests)),
-                        }
-                    )
-                    page.close()
-            sheet = build_contact_sheet(browser, output_dir, results) if args.contact_sheet else None
+                            )
+                            overflow = (
+                                metrics["documentWidth"] > metrics["viewportWidth"] + 1
+                            )
+                            stem = (
+                                f"{mode}-{color_scheme}-js-{javascript}-"
+                                f"{width}x{height}"
+                            )
+                            screenshot = output_dir / f"{stem}.png"
+                            page.screenshot(path=str(screenshot), full_page=True)
+                            fold = None
+                            if args.contact_sheet:
+                                fold = output_dir / f"{stem}-fold.png"
+                                page.screenshot(path=str(fold), full_page=False)
+                            results.append(
+                                {
+                                    "mode": mode,
+                                    "colorScheme": color_scheme,
+                                    "javascript": javascript,
+                                    "viewport": {"width": width, "height": height},
+                                    "screenshot": str(screenshot),
+                                    "fold": str(fold) if fold else None,
+                                    "metrics": metrics,
+                                    "horizontalOverflow": overflow,
+                                    "hiddenContent": metrics.pop("hiddenContent"),
+                                    "brokenImages": metrics.pop("brokenImages"),
+                                    "unnamedControls": metrics.pop("unnamedControls"),
+                                    "consoleErrors": sorted(set(console_errors)),
+                                    "pageErrors": sorted(set(page_errors)),
+                                    "failedRequests": sorted(set(failed_requests)),
+                                }
+                            )
+                            page.close()
+                context.close()
+            sheet = (
+                build_contact_sheet(browser, output_dir, results)
+                if args.contact_sheet
+                else None
+            )
             browser.close()
     except PlaywrightError as exc:
         print(f"Browser review could not run: {exc}", file=sys.stderr)
@@ -407,6 +542,8 @@ def main() -> int:
         "page": str(page_path),
         "viewports": [f"{width}x{height}" for width, height in viewports],
         "modes": list(modes),
+        "colorSchemes": list(color_schemes),
+        "javascript": list(javascript_modes),
         "scrolled": bool(args.scroll),
         "contactSheet": str(sheet) if sheet else None,
         "failures": failures,

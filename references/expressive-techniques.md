@@ -17,6 +17,7 @@ Use this reference when a page needs more expressive range than the selected rec
 | Collage and overprint | archives, fragmented memory, cultural montage, conflicting sources | rotated artifacts, cropped layers, registration marks, controlled overlap | evidence is obscured or “mess” replaces hierarchy |
 | Responsive geometric art | geometry, modular systems, architecture, playful computation | CSS/SVG forms reorganize meaningfully across breakpoints | shapes are generic decoration or imitate real objects poorly |
 | Typographic monument | a manifesto, name, phrase, or number legitimately carries the page | full-width type, extreme scale contrast, text as spatial anchor | the phrase cannot survive mobile or supporting copy is sacrificed |
+| Chromatic text accent | one pivotal word or phrase carries a real semantic turn | a restrained two-hue fill on one display phrase with a solid fallback | it becomes ambient decoration, reduces contrast, or spreads across paragraphs |
 | Retro-futurist atlas | astronomy, exploration, speculative history, old/new technology | restrained orbital lines, cream/ink fields, catalog labels, measured diagrams | decorative space clichés imply scientific accuracy |
 | Waveform or signal narrative | audio, rhythm, volatility, alternating states, or a measured story arc | one continuous line, direct annotations, a meaningful turning point | a random squiggle stands in for absent data |
 | Pixel or system-native narrative | games, computing history, state machines, low-resolution culture | discrete steps, pixel grid, limited palette, breakpoint “levels” | nostalgia overwhelms readability or fake game UI appears |
@@ -40,6 +41,8 @@ Do not choose three quiet cream-paper variants and call them different direction
 - Palette comes from content or brand through [Palette Families](palette-families.md), not from a style label.
 - Use authentic assets through [Asset Sourcing and Selection](asset-sourcing.md); do not fabricate product imagery, documentary evidence, or interfaces to satisfy a look.
 - Record the extension and its content source in the Design Read. If unrelated content could use it unchanged, revise or remove it.
+
+For a chromatic text accent, define one named gradient token and keep a solid accent-color fallback. Use two visibly distinct, palette-related hues rather than a monochrome tint. Apply the gradient only inside a feature query with `background-clip: text`; restore a solid color in print because printed backgrounds may be omitted. If the page supports multiple color schemes, derive and test a legible token for each. Do not use this extension when the recipe requires flat fills or evidence graphics would become less precise.
 
 ## Respect medium feasibility
 
